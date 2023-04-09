@@ -1,0 +1,57 @@
+[build-system]
+    requires = ["setuptools >= 61.2"]
+    build-backend = "setuptools.build_meta"
+
+[project]
+    name = "sonos-websocket"
+    description = "An asynchronous Python library to communicate with Sonos devices over websockets."
+    readme = "README.md"
+    classifiers = [
+        "Development Status :: 4 - Beta",
+        "Intended Audience :: Developers",
+        "License :: OSI Approved :: MIT License",
+        "Operating System :: OS Independent",
+        "Programming Language :: Python :: 3",
+        "Topic :: Home Automation",
+        "Topic :: Multimedia :: Sound/Audio",
+        "Topic :: Multimedia :: Sound/Audio :: Players",
+        "Topic :: Software Development :: Libraries :: Python Modules"
+    ]
+    requires-python = ">=3.10"
+    dynamic = ["version", "dependencies"]
+
+[[project.authors]]
+    name = "Jason Lawrence"
+    email = "jjlawren@users.noreply.github.com"
+
+[project.license]
+    text = "MIT License"
+
+[project.urls]
+    Homepage = "https://github.com/jjlawren/sonos-websocket"
+
+[tool.setuptools]
+    packages = ["sonos_websocket"]
+
+[tool.setuptools.dynamic.version]
+    attr = "sonos_websocket.__init__.__version__"
+
+[tool.setuptools.dynamic.dependencies]
+    file = ["requirements.txt"]
+
+[tool.ruff]
+target-version = "py310"
+
+select = [
+    "C",  # complexity
+    "D",  # docstrings
+    "E",  # pycodestyle
+    "F",  # pyflakes/autoflake
+    "RUF006", # Store a reference to the return value of asyncio.create_task
+    "W",  # pycodestyle
+]
+
+[tool.pylint]
+disable = [
+    "invalid-name",
+]
