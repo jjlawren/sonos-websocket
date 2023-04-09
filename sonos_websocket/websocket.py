@@ -6,7 +6,12 @@ from typing import Any, cast
 import aiohttp
 
 from .const import API_KEY
-from .exception import SonosWebsocketError, Unauthorized, SonosWSConnectionError
+from .exception import (
+    SonosWebsocketError,
+    SonosWSConnectionError,
+    Unauthorized,
+    Unsupported,
+)
 
 _LOGGER = logging.getLogger(__name__)
 
@@ -126,6 +131,8 @@ class SonosWebsocket:
         if player := next(
             (p for p in data["players"] if p["websocketUrl"] == self.uri), None
         ):
+            if "AUDIO_CLIP" not in player["capabilities"]:
+                raise Unsupported("Device does not support AUDIO_CLIP")
             self._player_id = cast(str, player["id"])
             return self._player_id
         raise SonosWebsocketError("No matching player found in group data")

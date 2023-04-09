@@ -47,6 +47,7 @@ select = [
     "D",  # docstrings
     "E",  # pycodestyle
     "F",  # pyflakes/autoflake
+    "I",  # isort
     "RUF006", # Store a reference to the return value of asyncio.create_task
     "W",  # pycodestyle
 ]
