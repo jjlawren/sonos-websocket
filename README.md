@@ -11,4 +11,4 @@ python -m sonos_websocket \
     --uri https://freetestdata.com/wp-content/uploads/2021/09/Free_Test_Data_100KB_MP3.mp3 \
     --volume 15
 ```
-Basic use of how to integrate the package can be found [here](sonos_websocket/__main__.py).
+Basic use of how to integrate the package can be found [here](https://github.com/jjlawren/sonos-websocket/blob/main/sonos_websocket/__main__.py).
