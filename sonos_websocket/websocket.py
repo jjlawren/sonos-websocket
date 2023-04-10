@@ -76,9 +76,10 @@ class SonosWebsocket:
             assert self.ws
 
         payload = [command, options or {}]
+        _LOGGER.debug("Sending command: %s", payload)
         await self.ws.send_json(payload)
         response = await self.ws.receive_json()
-        _LOGGER.debug("%s response: %s", command["command"], response)
+        _LOGGER.debug("Response: %s", response)
         return response
 
     async def play_clip(
@@ -106,7 +107,7 @@ class SonosWebsocket:
         """
         if self._household_id:
             return self._household_id
-        response, _ = await self.send_command({"command": "getHouseholdId"})
+        response, _ = await self.send_command({})
         if household_id := response.get("householdId"):
             self._household_id = household_id
             return household_id
