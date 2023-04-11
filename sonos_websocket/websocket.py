@@ -33,12 +33,14 @@ class SonosWebsocket:
         self.ws: aiohttp.ClientWebSocketResponse | None = None
         self._household_id = household_id
         self._player_id = player_id
+        self._connect_lock = asyncio.Lock()
 
     async def connect(self) -> None:
         """Open a persistent websocket connection and act on events."""
-        if self.ws and not self.ws.closed:
-            _LOGGER.warning("Websocket is already connected")
-            return
+        async with self._connect_lock:
+            if self.ws and not self.ws.closed:
+                _LOGGER.warning("Websocket is already connected")
+                return
 
         headers = {
             "X-Sonos-Api-Key": API_KEY,
