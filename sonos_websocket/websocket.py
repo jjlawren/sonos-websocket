@@ -92,9 +92,14 @@ class SonosWebsocket:
 
         payload = [command, options or {}]
         _LOGGER.debug("Sending command: %s", payload)
-        async with asyncio_timeout(3):
-            await self.ws.send_json(payload)
-            response = await self.ws.receive_json()
+        try:
+            async with asyncio_timeout(3):
+                await self.ws.send_json(payload)
+                response = await self.ws.receive_json()
+        except asyncio.TimeoutError as exc:
+            raise SonosWebsocketError("Command timed out") from exc
+        except TypeError as exc:
+            raise SonosWebsocketError(f"Bad response received: {exc}") from exc
         _LOGGER.debug("Response: %s", response)
         return response
 
