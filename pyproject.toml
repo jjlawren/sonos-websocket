@@ -52,6 +52,10 @@ select = [
     "W",  # pycodestyle
 ]
 
+[tool.ruff.isort]
+combine-as-imports = true
+force-sort-within-sections = true
+
 [tool.pylint]
 disable = [
     "invalid-name",
