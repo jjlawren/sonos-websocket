@@ -1,6 +1,7 @@
 """Handler for Sonos websockets."""
 import asyncio
 import logging
+import sys
 from typing import Any, cast
 
 import aiohttp
@@ -12,6 +13,12 @@ from .exception import (
     Unauthorized,
     Unsupported,
 )
+
+if sys.version_info[:2] < (3, 11):
+    from async_timeout import timeout as asyncio_timeout
+else:
+    from asyncio import timeout as asyncio_timeout
+
 
 _LOGGER = logging.getLogger(__name__)
 
@@ -42,14 +49,16 @@ class SonosWebsocket:
                 _LOGGER.warning("Websocket is already connected")
                 return
 
+        _LOGGER.debug("Opening websocket to %s", self.uri)
         headers = {
             "X-Sonos-Api-Key": API_KEY,
             "Sec-WebSocket-Protocol": "v1.api.smartspeaker.audio",
         }
         try:
-            self.ws = await self.session.ws_connect(
-                self.uri, headers=headers, heartbeat=15, verify_ssl=False
-            )
+            async with asyncio_timeout(3):
+                self.ws = await self.session.ws_connect(
+                    self.uri, headers=headers, verify_ssl=False
+                )
         except aiohttp.ClientResponseError as exc:
             if exc.code == 401:
                 _LOGGER.error("Credentials rejected: %s", exc)
@@ -57,10 +66,13 @@ class SonosWebsocket:
             raise SonosWSConnectionError(
                 f"Unexpected response received: {exc}"
             ) from exc
-        except (aiohttp.ClientConnectionError, asyncio.TimeoutError) as exc:
-            raise SonosWSConnectionError("Connection error: {exc}") from exc
+        except aiohttp.ClientConnectionError as exc:
+            raise SonosWSConnectionError(f"Connection error: {exc}") from exc
+        except asyncio.TimeoutError as exc:
+            raise SonosWSConnectionError("Connection timed out") from exc
         except Exception as exc:  # pylint: disable=broad-except
             raise SonosWSConnectionError(f"Unknown error: {exc}") from exc
+        _LOGGER.debug("Successfully connected to %s", self.uri)
 
     async def close(self):
         """Close the websocket connection."""
@@ -74,13 +86,15 @@ class SonosWebsocket:
     ) -> list[dict[str, Any]]:
         """Send commands over the websocket and handle their responses."""
         if not self.ws or self.ws.closed:
+            _LOGGER.debug("Websocket not available, reconnecting")
             await self.connect()
             assert self.ws
 
         payload = [command, options or {}]
         _LOGGER.debug("Sending command: %s", payload)
-        await self.ws.send_json(payload)
-        response = await self.ws.receive_json()
+        async with asyncio_timeout(3):
+            await self.ws.send_json(payload)
+            response = await self.ws.receive_json()
         _LOGGER.debug("Response: %s", response)
         return response
 
