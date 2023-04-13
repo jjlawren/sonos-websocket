@@ -6,7 +6,7 @@ from typing import Any, cast
 
 import aiohttp
 
-from .const import API_KEY
+from .const import API_KEY, MAX_ATTEMPTS
 from .exception import (
     SonosWebsocketError,
     SonosWSConnectionError,
@@ -85,23 +85,29 @@ class SonosWebsocket:
         self, command: dict[str, Any], options: dict[str, Any] | None = None
     ) -> list[dict[str, Any]]:
         """Send commands over the websocket and handle their responses."""
-        if not self.ws or self.ws.closed:
-            _LOGGER.debug("Websocket not available, reconnecting")
-            await self.connect()
-            assert self.ws
+        attempt = 1
+        while attempt <= MAX_ATTEMPTS:
+            if not self.ws or self.ws.closed:
+                _LOGGER.debug("Websocket not available, reconnecting")
+                await self.connect()
+                assert self.ws
 
-        payload = [command, options or {}]
-        _LOGGER.debug("Sending command: %s", payload)
-        try:
-            async with asyncio_timeout(3):
-                await self.ws.send_json(payload)
-                response = await self.ws.receive_json()
-        except asyncio.TimeoutError as exc:
-            raise SonosWebsocketError("Command timed out") from exc
-        except TypeError as exc:
-            raise SonosWebsocketError(f"Bad response received: {exc}") from exc
-        _LOGGER.debug("Response: %s", response)
-        return response
+            payload = [command, options or {}]
+            _LOGGER.debug("Sending command: %s", payload)
+            try:
+                async with asyncio_timeout(3):
+                    await self.ws.send_json(payload)
+                    return await self.ws.receive_json()
+            except asyncio.TimeoutError:
+                _LOGGER.error("Command timed out")
+            except TypeError as exc:
+                _LOGGER.error("Bad response received: %s", exc)
+            attempt += 1
+
+        command_name = command.get("command", "Empty")
+        raise SonosWebsocketError(
+            f"{command_name} command failed after {MAX_ATTEMPTS} attempts"
+        )
 
     async def play_clip(
         self, uri: str, volume: int | None = None
