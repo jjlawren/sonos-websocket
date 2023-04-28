@@ -5,6 +5,7 @@ import sys
 from typing import Any, cast
 
 import aiohttp
+from aiohttp import WSMsgType
 
 from .const import API_KEY, MAX_ATTEMPTS
 from .exception import (
@@ -88,7 +89,6 @@ class SonosWebsocket:
         attempt = 1
         while attempt <= MAX_ATTEMPTS:
             if not self.ws or self.ws.closed:
-                _LOGGER.debug("Websocket not available, reconnecting")
                 await self.connect()
                 assert self.ws
 
@@ -97,11 +97,16 @@ class SonosWebsocket:
             try:
                 async with asyncio_timeout(3):
                     await self.ws.send_json(payload)
-                    return await self.ws.receive_json()
+                    msg = await self.ws.receive()
             except asyncio.TimeoutError:
                 _LOGGER.error("Command timed out")
-            except TypeError as exc:
-                _LOGGER.error("Bad response received: %s", exc)
+            else:
+                if msg.type in (WSMsgType.CLOSE, WSMsgType.CLOSED, WSMsgType.CLOSING):
+                    _LOGGER.debug("Websocket closed, will try again")
+                elif msg.type != WSMsgType.TEXT:
+                    _LOGGER.error("Received non-text message: %s", msg)
+                else:
+                    return msg.json()
             attempt += 1
 
         command_name = command.get("command", "Empty")
