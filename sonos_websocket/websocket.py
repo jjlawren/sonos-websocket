@@ -104,7 +104,7 @@ class SonosWebsocket:
                 if msg.type in (WSMsgType.CLOSE, WSMsgType.CLOSED, WSMsgType.CLOSING):
                     _LOGGER.debug("Websocket closed, will try again")
                 elif msg.type != WSMsgType.TEXT:
-                    _LOGGER.error("Received non-text message: %s", msg)
+                    _LOGGER.error("Received non-text message: %s", msg.type.name)
                 else:
                     return msg.json()
             attempt += 1
