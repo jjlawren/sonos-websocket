@@ -100,6 +100,8 @@ class SonosWebsocket:
                     msg = await self.ws.receive()
             except asyncio.TimeoutError:
                 _LOGGER.error("Command timed out")
+            except ConnectionResetError:
+                _LOGGER.debug("Websocket connection reset, will try again")
             else:
                 if msg.type in (WSMsgType.CLOSE, WSMsgType.CLOSED, WSMsgType.CLOSING):
                     _LOGGER.debug("Websocket closed, will try again")
