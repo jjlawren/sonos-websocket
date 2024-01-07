@@ -10,7 +10,7 @@ logging.basicConfig(level=logging.DEBUG)
 
 async def main(options):
     """Entrypoint when running as a script."""
-    websocket = SonosWebsocket(options.ip_addr)
+    websocket = SonosWebsocket(options.ip_addr, timeout=options.timeout)
     await websocket.connect()
     await websocket.play_clip(
         uri=options.uri,
@@ -33,6 +33,13 @@ if __name__ == "__main__":
         type=int,
         required=False,
         help="Volume level to play at [0-100]",
+    )
+    parser.add_argument(
+        "--timeout",
+        "-t",
+        type=int,
+        required=False,
+        help="Timeout for the websocket connection",
     )
     args = parser.parse_args()
 
