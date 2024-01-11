@@ -33,6 +33,7 @@ class SonosWebsocket:
         player_id: str | None = None,
         household_id: str | None = None,
         session: aiohttp.ClientSession | None = None,
+        timeout: int = 6,
     ) -> None:
         """Initialize the websocket instance."""
         self.uri = f"wss://{ip_addr}:1443/websocket/api"
@@ -42,6 +43,7 @@ class SonosWebsocket:
         self._household_id = household_id
         self._player_id = player_id
         self._connect_lock = asyncio.Lock()
+        self._timeout = timeout
 
     async def connect(self) -> None:
         """Open a persistent websocket connection and act on events."""
@@ -56,7 +58,7 @@ class SonosWebsocket:
             "Sec-WebSocket-Protocol": "v1.api.smartspeaker.audio",
         }
         try:
-            async with asyncio_timeout(3):
+            async with asyncio_timeout(self._timeout):
                 self.ws = await self.session.ws_connect(
                     self.uri, headers=headers, verify_ssl=False
                 )
@@ -95,7 +97,7 @@ class SonosWebsocket:
             payload = [command, options or {}]
             _LOGGER.debug("Sending command: %s", payload)
             try:
-                async with asyncio_timeout(3):
+                async with asyncio_timeout(self._timeout):
                     await self.ws.send_json(payload)
                     msg = await self.ws.receive()
             except asyncio.TimeoutError:
