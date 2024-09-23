@@ -67,4 +67,5 @@ disable = [
     "invalid-name",
     "too-many-arguments",
     "too-many-instance-attributes",
+    "too-many-positional-arguments",
 ]
