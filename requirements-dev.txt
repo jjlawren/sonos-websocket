@@ -1,4 +1,4 @@
-aiohttp==3.11.7
+aiohttp==3.11.8
 async_timeout==4.0.2; python_version < "3.11"
 pre-commit==4.0.1
 pylint==3.3.1
