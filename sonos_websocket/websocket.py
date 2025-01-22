@@ -1,4 +1,5 @@
 """Handler for Sonos websockets."""
+
 import asyncio
 import logging
 import sys
