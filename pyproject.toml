@@ -17,7 +17,7 @@
         "Topic :: Multimedia :: Sound/Audio :: Players",
         "Topic :: Software Development :: Libraries :: Python Modules"
     ]
-    requires-python = ">=3.10"
+    requires-python = ">=3.11"
     dynamic = ["version", "dependencies"]
 
 [[project.authors]]
@@ -40,7 +40,7 @@
     file = ["requirements.txt"]
 
 [tool.ruff]
-target-version = "py310"
+target-version = "py311"
 
 select = [
     "C",  # complexity
