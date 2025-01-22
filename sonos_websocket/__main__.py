@@ -1,4 +1,5 @@
 """Commandline example to play an audio clip."""
+
 import argparse
 import asyncio
 import logging
