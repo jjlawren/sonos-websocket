@@ -27,7 +27,7 @@ jobs:
     runs-on: ubuntu-22.04
     steps:
       - name: Check out code from GitHub
-        uses: actions/checkout@v4.1.1
+        uses: actions/checkout@v5
       - name: Generate partial Python venv restore key
         id: generate_python_cache_key
         run: >-
@@ -46,7 +46,7 @@ jobs:
       - info
     steps:
       - name: Check out code from GitHub
-        uses: actions/checkout@v4.1.1
+        uses: actions/checkout@v5
       - name: Set up Python ${{ env.DEFAULT_PYTHON }}
         id: python
         uses: actions/setup-python@v6
@@ -91,7 +91,7 @@ jobs:
       - pre-commit
     steps:
       - name: Check out code from GitHub
-        uses: actions/checkout@v4.1.1
+        uses: actions/checkout@v5
       - name: Set up Python ${{ env.DEFAULT_PYTHON }}
         uses: actions/setup-python@v6
         id: python
@@ -131,7 +131,7 @@ jobs:
       - pre-commit
     steps:
       - name: Check out code from GitHub
-        uses: actions/checkout@v4.1.1
+        uses: actions/checkout@v5
       - name: Set up Python ${{ env.DEFAULT_PYTHON }}
         uses: actions/setup-python@v6
         id: python
@@ -169,7 +169,7 @@ jobs:
     needs: info
     steps:
       - name: Check out code from GitHub
-        uses: actions/checkout@v4.1.1
+        uses: actions/checkout@v5
       - name: Set up Python
         id: python
         uses: actions/setup-python@v6
@@ -217,7 +217,7 @@ jobs:
       - base
     steps:
       - name: Check out code from GitHub
-        uses: actions/checkout@v4.1.1
+        uses: actions/checkout@v5
       - name: Set up Python ${{ env.DEFAULT_PYTHON }}
         id: python
         uses: actions/setup-python@v6
@@ -247,7 +247,7 @@ jobs:
       - base
     steps:
       - name: Check out code from GitHub
-        uses: actions/checkout@v4.1.1
+        uses: actions/checkout@v5
       - name: Set up Python ${{ env.DEFAULT_PYTHON }}
         id: python
         uses: actions/setup-python@v6
