@@ -21,7 +21,7 @@ def ws() -> SonosWebsocket:
 
 
 @pytest.mark.asyncio
-async def test_play_clip_sends_correct_command(ws: SonosWebsocket) -> None:
+async def test_play_clip(ws: SonosWebsocket) -> None:
     """play_clip sends loadAudioClip with the expected namespace and streamUrl."""
     expected_response = [{"success": True}, {CLIP_ID: CLIP_ID_VALUE, "status": "ACTIVE"}]
 
