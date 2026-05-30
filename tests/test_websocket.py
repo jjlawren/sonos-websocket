@@ -33,6 +33,7 @@ async def test_play_clip_sends_correct_command(ws: SonosWebsocket) -> None:
     assert command["command"] == "loadAudioClip"
     assert command["playerId"] == PLAYER_ID
     assert options["streamUrl"] == TEST_URI
+    assert "volume" not in options
     assert result == expected_response
 
 
@@ -44,16 +45,6 @@ async def test_play_clip_with_volume(ws: SonosWebsocket) -> None:
 
     _, options = mock_send.call_args.args
     assert options["volume"] == 50
-
-
-@pytest.mark.asyncio
-async def test_play_clip_without_volume_omits_key(ws: SonosWebsocket) -> None:
-    """play_clip does not include volume in options when not provided."""
-    with patch.object(ws, "send_command", new=AsyncMock(return_value=[{}, {}])) as mock_send:
-        await ws.play_clip(TEST_URI)
-
-    _, options = mock_send.call_args.args
-    assert "volume" not in options
 
 
 @pytest.mark.asyncio
