@@ -66,6 +66,7 @@ force-sort-within-sections = true
 [tool.pylint]
 disable = [
     "invalid-name",
+    "redefined-outer-name",
     "too-many-arguments",
     "too-many-instance-attributes",
     "too-many-positional-arguments",
