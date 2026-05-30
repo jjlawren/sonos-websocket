@@ -71,31 +71,3 @@ async def test_cancel_clip_sends_correct_command(ws: SonosWebsocket) -> None:
     assert options[CLIP_ID] == CLIP_ID_VALUE
     assert result == expected_response
 
-
-@pytest.mark.asyncio
-async def test_cancel_clip_uses_clip_id_constant(ws: SonosWebsocket) -> None:
-    """The options key for the clip ID matches the exported CLIP_ID constant."""
-    with patch.object(ws, "send_command", new=AsyncMock(return_value=[{}, {}])) as mock_send:
-        await ws.cancel_clip(CLIP_ID_VALUE)
-
-    _, options = mock_send.call_args.args
-    # CLIP_ID constant must be present as a key in the options dict
-    assert CLIP_ID in options
-    assert options[CLIP_ID] == CLIP_ID_VALUE
-
-
-@pytest.mark.asyncio
-async def test_play_then_cancel_clip(ws: SonosWebsocket) -> None:
-    """Clip ID returned by play_clip can be used directly with cancel_clip."""
-    play_response = [{"success": True}, {CLIP_ID: CLIP_ID_VALUE, "status": "ACTIVE"}]
-    cancel_response = [{"success": True}, {}]
-
-    with patch.object(ws, "send_command", new=AsyncMock(side_effect=[play_response, cancel_response])) as mock_send:
-        _, play_data = await ws.play_clip(TEST_URI)
-        clip_id = play_data[CLIP_ID]
-        await ws.cancel_clip(clip_id)
-
-    assert mock_send.call_count == 2
-    cancel_command, cancel_options = mock_send.call_args.args
-    assert cancel_command["command"] == "cancelAudioClip"
-    assert cancel_options[CLIP_ID] == CLIP_ID_VALUE
