@@ -70,3 +70,6 @@ disable = [
     "too-many-instance-attributes",
     "too-many-positional-arguments",
 ]
+
+[tool.pytest.ini_options]
+asyncio_mode = "auto"

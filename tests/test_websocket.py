@@ -4,7 +4,7 @@ from unittest.mock import AsyncMock, MagicMock, patch
 
 import pytest
 
-from sonos_websocket import CLIP_ID, SonosWebsocket
+from sonos_websocket import SonosWebsocket
 
 PLAYER_ID = "RINCON_1234567890"
 CLIP_ID_VALUE = "clip-abc-123"
@@ -20,10 +20,9 @@ def ws() -> SonosWebsocket:
     return instance
 
 
-@pytest.mark.asyncio
 async def test_play_clip(ws: SonosWebsocket) -> None:
     """play_clip sends loadAudioClip with the expected namespace and streamUrl."""
-    expected_response = [{"success": True}, {CLIP_ID: CLIP_ID_VALUE, "status": "ACTIVE"}]
+    expected_response = [{"success": True}, {"id": CLIP_ID_VALUE, "status": "ACTIVE"}]
 
     with patch.object(ws, "send_command", new=AsyncMock(return_value=expected_response)) as mock_send:
         result = await ws.play_clip(TEST_URI)
@@ -37,7 +36,6 @@ async def test_play_clip(ws: SonosWebsocket) -> None:
     assert result == expected_response
 
 
-@pytest.mark.asyncio
 async def test_play_clip_with_volume(ws: SonosWebsocket) -> None:
     """play_clip includes volume in options when provided."""
     with patch.object(ws, "send_command", new=AsyncMock(return_value=[{}, {}])) as mock_send:
@@ -47,7 +45,6 @@ async def test_play_clip_with_volume(ws: SonosWebsocket) -> None:
     assert options["volume"] == 50
 
 
-@pytest.mark.asyncio
 async def test_cancel_clip(ws: SonosWebsocket) -> None:
     """cancel_clip sends cancelAudioClip with the clip ID in options."""
     expected_response = [{"success": True}, {}]
@@ -59,6 +56,6 @@ async def test_cancel_clip(ws: SonosWebsocket) -> None:
     assert command["namespace"] == "audioClip:1"
     assert command["command"] == "cancelAudioClip"
     assert command["playerId"] == PLAYER_ID
-    assert options[CLIP_ID] == CLIP_ID_VALUE
+    assert options["id"] == CLIP_ID_VALUE
     assert result == expected_response
 

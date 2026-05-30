@@ -8,7 +8,7 @@ from typing import Any, cast
 import aiohttp
 from aiohttp import WSMsgType
 
-from .const import API_KEY, CLIP_ID, MAX_ATTEMPTS
+from .const import API_KEY, CLIP_ID_KEY, MAX_ATTEMPTS
 from .exception import (
     SonosWebsocketError,
     SonosWSConnectionError,
@@ -146,7 +146,7 @@ class SonosWebsocket:
             "command": "cancelAudioClip",
             "playerId": await self.get_player_id(),
         }
-        options = {CLIP_ID: clip_id}
+        options: dict[str, Any] = {CLIP_ID_KEY: clip_id}
         return await self.send_command(command, options)
 
     async def get_household_id(self) -> str:
