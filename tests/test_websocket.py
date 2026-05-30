@@ -16,7 +16,9 @@ def ws() -> SonosWebsocket:
     """Return a SonosWebsocket instance with a pre-set player ID."""
     mock_session = MagicMock()
     mock_session.closed = False
-    instance = SonosWebsocket("192.168.1.100", player_id=PLAYER_ID, session=mock_session)
+    instance = SonosWebsocket(
+        "192.168.1.100", player_id=PLAYER_ID, session=mock_session
+    )
     return instance
 
 
@@ -24,7 +26,9 @@ async def test_play_clip(ws: SonosWebsocket) -> None:
     """play_clip sends loadAudioClip with the expected namespace and streamUrl."""
     expected_response = [{"success": True}, {"id": CLIP_ID_VALUE, "status": "ACTIVE"}]
 
-    with patch.object(ws, "send_command", new=AsyncMock(return_value=expected_response)) as mock_send:
+    with patch.object(
+        ws, "send_command", new=AsyncMock(return_value=expected_response)
+    ) as mock_send:
         result = await ws.play_clip(TEST_URI)
 
     command, options = mock_send.call_args.args
@@ -38,7 +42,9 @@ async def test_play_clip(ws: SonosWebsocket) -> None:
 
 async def test_play_clip_with_volume(ws: SonosWebsocket) -> None:
     """play_clip includes volume in options when provided."""
-    with patch.object(ws, "send_command", new=AsyncMock(return_value=[{}, {}])) as mock_send:
+    with patch.object(
+        ws, "send_command", new=AsyncMock(return_value=[{}, {}])
+    ) as mock_send:
         await ws.play_clip(TEST_URI, volume=50)
 
     _, options = mock_send.call_args.args
@@ -49,7 +55,9 @@ async def test_cancel_clip(ws: SonosWebsocket) -> None:
     """cancel_clip sends cancelAudioClip with the clip ID in options."""
     expected_response = [{"success": True}, {}]
 
-    with patch.object(ws, "send_command", new=AsyncMock(return_value=expected_response)) as mock_send:
+    with patch.object(
+        ws, "send_command", new=AsyncMock(return_value=expected_response)
+    ) as mock_send:
         result = await ws.cancel_clip(CLIP_ID_VALUE)
 
     command, options = mock_send.call_args.args
@@ -58,4 +66,3 @@ async def test_cancel_clip(ws: SonosWebsocket) -> None:
     assert command["playerId"] == PLAYER_ID
     assert options["id"] == CLIP_ID_VALUE
     assert result == expected_response
-
