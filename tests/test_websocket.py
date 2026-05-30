@@ -48,7 +48,7 @@ async def test_play_clip_with_volume(ws: SonosWebsocket) -> None:
 
 
 @pytest.mark.asyncio
-async def test_cancel_clip_sends_correct_command(ws: SonosWebsocket) -> None:
+async def test_cancel_clip(ws: SonosWebsocket) -> None:
     """cancel_clip sends cancelAudioClip with the clip ID in options."""
     expected_response = [{"success": True}, {}]
 
