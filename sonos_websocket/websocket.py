@@ -8,7 +8,7 @@ from typing import Any, cast
 import aiohttp
 from aiohttp import WSMsgType
 
-from .const import API_KEY, MAX_ATTEMPTS
+from .const import API_KEY, CLIP_ID_KEY, MAX_ATTEMPTS
 from .exception import (
     SonosWebsocketError,
     SonosWSConnectionError,
@@ -137,6 +137,16 @@ class SonosWebsocket:
         }
         if volume:
             options["volume"] = volume
+        return await self.send_command(command, options)
+
+    async def cancel_clip(self, clip_id: str) -> list[dict[str, Any]]:
+        """Cancel an active audio clip by its ID."""
+        command = {
+            "namespace": "audioClip:1",
+            "command": "cancelAudioClip",
+            "playerId": await self.get_player_id(),
+        }
+        options: dict[str, Any] = {CLIP_ID_KEY: clip_id}
         return await self.send_command(command, options)
 
     async def get_household_id(self) -> str:
